@@ -4,6 +4,9 @@
 from mpi4py import MPI
 import numpy
 import sys
+import time
+
+start = time.time()
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -55,3 +58,6 @@ comm.Reduce(local_dot, dot, op = MPI.SUM)
 if (rank == 0):
 	print "The dot product is", dot[0], "computed in parallel"
 	print "and", numpy.dot(x,y), "computed serially"
+
+end = time.time()
+print "Time to compute = ", (end-start)
