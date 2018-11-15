@@ -55,6 +55,13 @@ integral[0] = integrateRange(local_a, local_b, local_n)
 # root node receives results with a collective "reduce"
 comm.Reduce(integral, total, op=MPI.SUM, root=0)
 
+# Print variables
+print "h = : ", h
+print "local n = : ", local_n
+print "local_a = : ", local_a
+print "local_b = : ", local_b
+
+
 # root process prints results
 if comm.rank == 0:
     print "With n =", n, "trapezoids, our estimate of the integral from"\
