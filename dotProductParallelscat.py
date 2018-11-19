@@ -4,6 +4,9 @@
 from mpi4py import MPI
 import numpy
 import sys
+import time
+
+start = time.time()
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
