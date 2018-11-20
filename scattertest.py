@@ -6,6 +6,7 @@ from mpi4py import MPI
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
+size = comm.Get_size()
 
 if rank == 0:
     x = numpy.linspace(0,100,11)
@@ -20,7 +21,8 @@ else:
 if rank ==0:
     print "Scatter"
 
-comm.Scatterv([x,(1,1,9),(0,1,2),MPI.DOUBLE],xlocal)
+counts = [1,1,9]
+comm.Scatterv([x,counts,(0,1,2),MPI.DOUBLE],xlocal)
 print ("process " + str(rank) + " has " +str(xlocal))
 
 comm.Barrier()
@@ -30,5 +32,8 @@ if rank == 0:
 else:
     xGathered = None
 
-comm.Gatherv(xlocal,[xGathered,(1,1,9),(0,1,2),MPI.DOUBLE])
+comm.Gatherv(xlocal,[xGathered,counts,(0,1,2),MPI.DOUBLE])
 print ("process " + str(rank) + " has " +str(xGathered))
+
+#comm.Reduce(xlocal,x, op = MPI.SUM)
+#print x[0]
