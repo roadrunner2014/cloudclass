@@ -68,6 +68,7 @@ print ("Process " + str(rank) + " Gather dot calculation =", dot)
 
 #sum the results of each
 comm.Reduce(local_dot, dot, op = MPI.SUM)
+
 #comm.Reduce(local_dot, dot, op = MPI.MAX(local_dot,dot))
 if (rank == 0):
     print "The dot product is", dot[0], "computed in parallel"

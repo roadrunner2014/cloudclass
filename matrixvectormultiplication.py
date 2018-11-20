@@ -1,6 +1,6 @@
-#-------------- scattertest.py --------------------------
+#-------------- matrixvectormultiplcation.py --------------------------
 # for correct performance, run unbuffered with 3 processes:
-# mpiexec -n 3 python26 scratch.py -u
+# mpiexec -n 3 python26 matrixvectormultiplcation.py
 import numpy
 from mpi4py import MPI
 
@@ -8,27 +8,32 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-A = numpy.array([[1.,2.,3.],[4.,5.,6.],[7.,8.,9.]])
-local_a = numpy.zeros(3)
-comm.Scatter(A,local_a)
-print "process", rank, "has", local_a
+matrix = numpy.array([[1.,2.,3.],[4.,5.,6.],[7.,8.,9.]])
+vector = numpy.array([1.,2.,3.])
 
-if rank == 0:
-    x = numpy.linspace(0,100,11)
-else:
-    x = None
+def multiply(v, G):
+    result = []
+    for i in range(len(G[0])): #this loops through columns of the matrix
+        total = 0
+        for j in range(len(v)): #this loops through vector coordinates & rows of matrix
+            total += v[j] * G[j][i]
+        result.append(total)
+    return result
 
-if rank == 2:
-    xlocal = numpy.zeros(9)
-else:
-    xlocal = numpy.zeros(1)
+# Set local empty matrix and vector for use in processes
+local_matrix = numpy.empty([3.,3.])
+local_vector = numpy.empty([3.])
 
-if rank ==0:
-    print "Scatter"
+# Send matrix to processes using Scatter
+comm.Scatter(matrix,local_matrix)
 
-counts = [1,1,9]
-comm.Scatterv([x,counts,(0,1,2),MPI.DOUBLE],xlocal)
-print ("process " + str(rank) + " has " +str(xlocal))
+# Send vector to processes using Scatter
+comm.Scatter(vector,local_vector)
+
+#local computation of dot product
+local_product = local_matrix * local_vector
+print ("Process " + str(rank) + "Local calculation =", local_product)
+
 
 comm.Barrier()
 if rank == 0:
